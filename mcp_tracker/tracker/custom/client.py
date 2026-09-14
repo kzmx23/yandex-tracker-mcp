@@ -11,7 +11,7 @@ from typing import Any, Literal
 
 import jwt
 import yandexcloud
-from aiohttp import ClientResponse, ClientSession, ClientTimeout
+from aiohttp import ClientResponse, ClientSession, ClientTimeout, FormData
 from pydantic import BaseModel, Field, RootModel
 from yandex.cloud.iam.v1.iam_token_service_pb2 import CreateIamTokenRequest
 from yandex.cloud.iam.v1.iam_token_service_pb2_grpc import IamTokenServiceStub
@@ -1044,6 +1044,37 @@ class TrackerClient(
                 not_found=IssueNotFound(issue_id),
             )
         ).root
+
+    async def issue_add_attachment(
+        self,
+        issue_id: str,
+        *,
+        file_path: str,
+        filename: str | None = None,
+        auth: YandexAuth | None = None,
+    ) -> IssueAttachment:
+        import mimetypes
+        import os
+
+        name = filename or os.path.basename(file_path)
+        with open(file_path, "rb") as fh:
+            payload = fh.read()
+        content_type = mimetypes.guess_type(name)[0] or "application/octet-stream"
+
+        # Attachments go as multipart/form-data, which `_request` (JSON-only) does
+        # not build; post directly, reusing header assembly and error handling.
+        headers = await self._build_headers(auth)
+        form = FormData()
+        form.add_field("file", payload, filename=name, content_type=content_type)
+        async with self._session.post(
+            f"v3/issues/{issue_id}/attachments",
+            data=form,
+            headers=headers,
+        ) as response:
+            if response.status == 404:
+                raise IssueNotFound(issue_id)
+            await self._raise_for_status(response)
+            return IssueAttachment.model_validate_json(await response.read())
 
     async def users_list(
         self, per_page: int = 50, page: int = 1, *, auth: YandexAuth | None = None

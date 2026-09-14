@@ -40,6 +40,7 @@ from mcp_tracker.tracker.proto.types.inputs import (
 from mcp_tracker.tracker.proto.types.issues import (
     ChecklistItem,
     Issue,
+    IssueAttachment,
     IssueComment,
     IssueLink,
     IssueLinkRelationship,
@@ -97,6 +98,39 @@ def _build_move_options_schema(
 
 def register_issue_write_tools(settings: Settings, mcp: FastMCP[Any]) -> None:
     """Register issue write tools (not registered in read-only mode)."""
+
+    @mcp.tool(
+        title="Add Attachment to Issue",
+        description="Attach a local file to a Yandex Tracker issue. Pass the absolute "
+        "path to a file readable on the MCP server host; the file is uploaded as "
+        "multipart/form-data. Max file size 8 MB. Returns the created attachment.",
+        annotations=ToolAnnotations(readOnlyHint=False),
+    )
+    async def issue_add_attachment(
+        ctx: Context[Any, AppContext],
+        issue_id: IssueID,
+        file_path: Annotated[
+            str,
+            Field(
+                description="Absolute path to the local file to attach, on the host "
+                "where the MCP server runs."
+            ),
+        ],
+        filename: Annotated[
+            str | None,
+            Field(
+                description="Optional name to show in Tracker; defaults to the file's "
+                "own name."
+            ),
+        ] = None,
+    ) -> IssueAttachment:
+        check_issue_access(settings, issue_id, write=True)
+        return await ctx.request_context.lifespan_context.issues.issue_add_attachment(
+            issue_id,
+            file_path=file_path,
+            filename=filename,
+            auth=get_yandex_auth(ctx),
+        )
 
     @mcp.tool(
         title="Execute Issue Transition",
