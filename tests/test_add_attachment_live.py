@@ -41,13 +41,11 @@ async def main() -> int:
         assert att.name == "mcp_test.txt", f"имя не совпало: {att.name}"
         print(f"ATTACH OK id={att.id} name={att.name} size={att.size}")
 
-        # уборка: удалить тестовое вложение тем же сеансом
-        headers = await client._build_headers(None)
-        async with client._session.delete(
-            f"v3/issues/{issue_id}/attachments/{att.id}", headers=headers
-        ) as r:
-            print(f"DELETE status={r.status}")
-            assert r.status in (200, 204), f"удаление не удалось: {r.status}"
+        # уборка: удалить тестовое вложение новым методом и убедиться, что его нет
+        await client.issue_delete_attachment(issue_id, str(att.id))
+        left = [a.id for a in await client.issue_get_attachments(issue_id)]
+        assert att.id not in left, f"вложение {att.id} не удалено"
+        print(f"DELETE OK id={att.id}")
         os.unlink(path)
         print("SELFTEST_OK")
         return 0

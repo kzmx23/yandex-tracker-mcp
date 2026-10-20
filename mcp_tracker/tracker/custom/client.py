@@ -1076,6 +1076,21 @@ class TrackerClient(
             await self._raise_for_status(response)
             return IssueAttachment.model_validate_json(await response.read())
 
+    async def issue_delete_attachment(
+        self,
+        issue_id: str,
+        attachment_id: str,
+        *,
+        auth: YandexAuth | None = None,
+    ) -> None:
+        """Delete a file attached to an issue (API answers 204 with no body)."""
+        await self._read(
+            "DELETE",
+            f"v3/issues/{issue_id}/attachments/{attachment_id}",
+            auth=auth,
+            not_found=IssueNotFound(issue_id),
+        )
+
     async def users_list(
         self, per_page: int = 50, page: int = 1, *, auth: YandexAuth | None = None
     ) -> PaginatedResult[User]:

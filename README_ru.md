@@ -620,6 +620,8 @@ claude mcp add yandex-tracker docker "run --rm -i -e TRACKER_TOKEN=ваш_ток
 | `issue_update_worklog` | Изменить запись о времени | `issue_id`, `worklog_id`, `duration`, `comment`, `start` |
 | `issue_delete_worklog` | Удалить запись о времени | `issue_id`, `worklog_id` |
 | `issue_get_attachments` | Метаданные вложений | `issue_id`, `fields` |
+| `issue_add_attachment` | Загрузить локальный файл в задачу (multipart, до 8 МБ) | `issue_id`, `file_path`, `filename` |
+| `issue_delete_attachment` | Удалить вложение из задачи | `issue_id`, `attachment_id` (из `issue_get_attachments`) |
 | `issue_get_checklist` | Чек-лист вместе с id пунктов, которые нужны инструментам записи | `issue_id` |
 | `issue_add_checklist_items` | Добавить пункты по порядку, создав чек-лист, если его не было | `issue_id`, `items` (`text`, `checked`, `assignee`, `deadline`) |
 | `issue_update_checklist_item` | Изменить один пункт; непереданные поля сохраняют значение | `issue_id`, `checklist_item_id`, `text`, `checked`, `assignee`, `deadline`, `clear_assignee`, `clear_deadline` |

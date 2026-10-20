@@ -361,6 +361,14 @@
       "description": "Get attachments for an issue"
     },
     {
+      "name": "issue_add_attachment",
+      "description": "Upload a local file to an issue"
+    },
+    {
+      "name": "issue_delete_attachment",
+      "description": "Delete a file attached to an issue"
+    },
+    {
       "name": "issue_add_checklist_items",
       "description": "Add one or more items to the checklist of a Yandex Tracker issue"
     },

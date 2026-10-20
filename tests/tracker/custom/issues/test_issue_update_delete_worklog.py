@@ -96,3 +96,30 @@ class TestIssueDeleteWorklog:
                 await tracker_client.issue_delete_worklog("NOTFOUND-123", 10)
 
             assert exc_info.value.issue_id == "NOTFOUND-123"
+
+
+class TestIssueDeleteAttachment:
+    async def test_success(self, tracker_client: TrackerClient) -> None:
+        capture = RequestCapture(status=204)
+
+        with aioresponses() as m:
+            m.delete(
+                "https://api.tracker.yandex.net/v3/issues/TEST-123/attachments/306",
+                callback=capture.callback,
+            )
+
+            await tracker_client.issue_delete_attachment("TEST-123", "306")
+
+        capture.assert_called_once()
+
+    async def test_not_found(self, tracker_client: TrackerClient) -> None:
+        with aioresponses() as m:
+            m.delete(
+                "https://api.tracker.yandex.net/v3/issues/NOTFOUND-123/attachments/306",
+                status=404,
+            )
+
+            with pytest.raises(IssueNotFound) as exc_info:
+                await tracker_client.issue_delete_attachment("NOTFOUND-123", "306")
+
+            assert exc_info.value.issue_id == "NOTFOUND-123"

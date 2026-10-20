@@ -138,6 +138,13 @@ class IssueProtocol(Protocol):
         filename: str | None = None,
         auth: YandexAuth | None = None,
     ) -> IssueAttachment: ...
+    async def issue_delete_attachment(
+        self,
+        issue_id: str,
+        attachment_id: str,
+        *,
+        auth: YandexAuth | None = None,
+    ) -> None: ...
     async def issues_count(
         self, query: str, *, auth: YandexAuth | None = None
     ) -> int: ...

@@ -551,6 +551,38 @@ class TestIssueDeleteWorklog:
         mock_issues_protocol.issue_delete_worklog.assert_not_called()
 
 
+class TestIssueDeleteAttachment:
+    async def test_deletes_attachment(
+        self,
+        client_session: ClientSession,
+        mock_issues_protocol: AsyncMock,
+    ) -> None:
+        mock_issues_protocol.issue_delete_attachment.return_value = None
+
+        result = await client_session.call_tool(
+            "issue_delete_attachment",
+            {"issue_id": "TEST-123", "attachment_id": "306"},
+        )
+
+        assert not result.isError
+        call_args = mock_issues_protocol.issue_delete_attachment.call_args
+        assert call_args.args[0] == "TEST-123"
+        assert call_args.args[1] == "306"
+
+    async def test_restricted_queue_raises_error(
+        self,
+        client_session_with_limits: ClientSession,
+        mock_issues_protocol: AsyncMock,
+    ) -> None:
+        result = await client_session_with_limits.call_tool(
+            "issue_delete_attachment",
+            {"issue_id": "RESTRICTED-123", "attachment_id": "306"},
+        )
+
+        assert result.isError
+        mock_issues_protocol.issue_delete_attachment.assert_not_called()
+
+
 class TestIssueAddComment:
     async def test_adds_comment(
         self,

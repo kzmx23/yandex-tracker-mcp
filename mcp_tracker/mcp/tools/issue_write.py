@@ -133,6 +133,29 @@ def register_issue_write_tools(settings: Settings, mcp: FastMCP[Any]) -> None:
         )
 
     @mcp.tool(
+        title="Delete Issue Attachment",
+        description="Delete a file attached to a Yandex Tracker issue. Take the "
+        "attachment id from `issue_get_attachments`. The file is removed for good.",
+        annotations=ToolAnnotations(readOnlyHint=False, destructiveHint=True),
+    )
+    async def issue_delete_attachment(
+        ctx: Context[Any, AppContext],
+        issue_id: IssueID,
+        attachment_id: Annotated[
+            str,
+            Field(description="Attachment id, as returned by `issue_get_attachments`."),
+        ],
+    ) -> None:
+        check_issue_access(settings, issue_id, write=True)
+        return (
+            await ctx.request_context.lifespan_context.issues.issue_delete_attachment(
+                issue_id,
+                attachment_id,
+                auth=get_yandex_auth(ctx),
+            )
+        )
+
+    @mcp.tool(
         title="Execute Issue Transition",
         description="Execute a status transition for a Yandex Tracker issue. Call "
         "`issue_get_transitions` first and pass one of the ids it returned - the API "

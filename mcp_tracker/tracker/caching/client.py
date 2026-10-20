@@ -345,6 +345,17 @@ def make_cached_protocols(
                 issue_id, file_path=file_path, filename=filename, auth=auth
             )
 
+        async def issue_delete_attachment(
+            self,
+            issue_id: str,
+            attachment_id: str,
+            *,
+            auth: YandexAuth | None = None,
+        ) -> None:
+            return await self._original.issue_delete_attachment(
+                issue_id, attachment_id, auth=auth
+            )
+
         @cached(**cache_config)
         async def issues_count(
             self, query: str, *, auth: YandexAuth | None = None

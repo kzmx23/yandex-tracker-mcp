@@ -623,6 +623,8 @@ These four are organization-wide. A queue may accept only some of the values the
 | `issue_update_worklog` | Edit a worklog entry | `issue_id`, `worklog_id`, `duration`, `comment`, `start` |
 | `issue_delete_worklog` | Delete a worklog entry | `issue_id`, `worklog_id` |
 | `issue_get_attachments` | Attachment metadata | `issue_id`, `fields` |
+| `issue_add_attachment` | Upload a local file to an issue (multipart, up to 8 MB) | `issue_id`, `file_path`, `filename` |
+| `issue_delete_attachment` | Delete a file attached to an issue | `issue_id`, `attachment_id` (from `issue_get_attachments`) |
 | `issue_get_checklist` | The checklist, with the item ids the write tools need | `issue_id` |
 | `issue_add_checklist_items` | Append items in order, creating the checklist if there is none | `issue_id`, `items` (`text`, `checked`, `assignee`, `deadline`) |
 | `issue_update_checklist_item` | Change one item; the fields you omit keep their value | `issue_id`, `checklist_item_id`, `text`, `checked`, `assignee`, `deadline`, `clear_assignee`, `clear_deadline` |

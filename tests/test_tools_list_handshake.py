@@ -44,8 +44,10 @@ def main() -> int:
         if obj.get("id") == 2 and "result" in obj:
             tools = [t["name"] for t in obj["result"].get("tools", [])]
     print(f"tools count: {len(tools)}")
-    has = "issue_add_attachment" in tools
-    print(f"issue_add_attachment present: {has}")
+    need = ("issue_add_attachment", "issue_delete_attachment")
+    for name in need:
+        print(f"{name} present: {name in tools}")
+    has = all(name in tools for name in need)
     if not has:
         print("STDERR tail:", proc.stderr[-800:])
         print("tools:", sorted(tools))
